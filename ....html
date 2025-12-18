@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>File Publisher with Warning</title>
+<style>
+  body { font-family: Arial; margin: 20px; }
+  #fileList, #publishedList { margin-top: 20px; }
+  button { margin-left: 10px; }
+</style>
+</head>
+<body>
+
+<h1>Upload and Publish Files</h1>
+<input type="file" id="fileInput">
+<button onclick="uploadFile()">Upload</button>
+
+<h2>Uploaded Files:</h2>
+<ul id="fileList"></ul>
+
+<h2>Published Files:</h2>
+<ul id="publishedList"></ul>
+
+<script>
+let files = [];
+let publishedFiles = [];
+
+function uploadFile() {
+    const input = document.getElementById('fileInput');
+    if(input.files.length === 0) return alert("Select a file first!");
+    const file = input.files[0];
+    files.push(file);
+    displayFiles();
+    input.value = "";
+}
+
+function displayFiles() {
+    const list = document.getElementById('fileList');
+    list.innerHTML = "";
+    files.forEach((file, index) => {
+        const li = document.createElement('li');
+        li.textContent = file.name;
+
+        const downloadBtn = document.createElement('button');
+        downloadBtn.textContent = "Download";
+        downloadBtn.onclick = () => downloadFile(file);
+
+        const publishBtn = document.createElement('button');
+        publishBtn.textContent = "Publish";
+        publishBtn.onclick = () => publishFile(index);
+
+        li.appendChild(downloadBtn);
+        li.appendChild(publishBtn);
+        list.appendChild(li);
+    });
+}
+
+function displayPublished() {
+    const list = document.getElementById('publishedList');
+    list.innerHTML = "";
+    publishedFiles.forEach((file) => {
+        const li = document.createElement('li');
+        li.textContent = file.name;
+
+        const downloadBtn = document.createElement('button');
+        downloadBtn.textContent = "Download";
+        downloadBtn.onclick = () => downloadFile(file);
+
+        li.appendChild(downloadBtn);
+        list.appendChild(li);
+    });
+}
+
+function publishFile(index) {
+    const file = files[index];
+    publishedFiles.push(file);
+    files.splice(index, 1);
+    displayFiles();
+    displayPublished();
+}
+
+function downloadFile(file) {
+    if(!confirm("⚠️ Warning: This file may contain viruses. We are not responsible. Do you want to continue?")) {
+        return;
+    }
+    const url = URL.createObjectURL(file);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file.name;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>
